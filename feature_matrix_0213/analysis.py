@@ -18,37 +18,44 @@ import pickle
 
 #-------------------------------------------------------------------------
 
+def findPopularSentiment(sent_array): 
+	num_neutral = (sent_array == 0).sum()	# Find the sum of neg/pos/neutral sentiments 
+	num_pos = (sent_array == 1).sum()
+	num_neg = (sent_array == -1).sum()
+	sentiments = np.array([num_neg, num_neutral, num_pos])
+	maxval = np.argmax(sentiments)
+	if (maxval == 0): 
+		return "Negative"
+	elif (maxval == 2): 
+		return "Positive"
+	else: 
+		return "Neutral"
+
+
 # Samples: classified tweets (polarity from -1 to 1)
 # Features: weather features such as humidity, pressure, temperature, wind speed
 
 # Files to train the linear regression model
 KansasCity_f = open('KansasCity_feature_matrix.pkl', 'rb')		# Open location specific file 
 StLouis_f = open('SaintLouis_feature_matrix.pkl', 'rb')
-
 Atlanta_f = open('Atlanta_feature_matrix.pkl', 'rb')
-
 Seattle_f = open('Seattle_feature_matrix.pkl', 'rb')
 Portland_f = open('Portland_feature_matrix.pkl', 'rb')
-
 SanDiego_f = open('SanDiego_feature_matrix.pkl', 'rb')
 Phoenix_f = open('Phoenix_feature_matrix.pkl', 'rb')
-
 Boston_f = open('Boston_feature_matrix.pkl', 'rb')
+NewYork_f = open('NewYork_feature_matrix.pkl', 'rb')
 
-
-# Files with full matrix 
-KansasCity_full = open('KansasCity_feature_matrix_full.pkl', 'rb')		# Open location specific file 
-StLouis_full = open('SaintLouis_feature_matrix_full.pkl', 'rb')
-
-Atlanta_full = open('Atlanta_feature_matrix_full.pkl', 'rb')
-
-Seattle_full = open('Seattle_feature_matrix_full.pkl', 'rb')
-Portland_full = open('Portland_feature_matrix_full.pkl', 'rb')
-
-SanDiego_full = open('SanDiego_feature_matrix_full.pkl', 'rb')
-Phoenix_full = open('Phoenix_feature_matrix_full.pkl', 'rb')
-
-Boston_full = open('Boston_feature_matrix_full.pkl', 'rb')
+# # Files with full matrix 
+# KansasCity_full = open('KansasCity_feature_matrix_full.pkl', 'rb')		# Open location specific file 
+# StLouis_full = open('SaintLouis_feature_matrix_full.pkl', 'rb')
+# Atlanta_full = open('Atlanta_feature_matrix_full.pkl', 'rb')
+# Seattle_full = open('Seattle_feature_matrix_full.pkl', 'rb')
+# Portland_full = open('Portland_feature_matrix_full.pkl', 'rb')
+# SanDiego_full = open('SanDiego_feature_matrix_full.pkl', 'rb')
+# Phoenix_full = open('Phoenix_feature_matrix_full.pkl', 'rb')
+# Boston_full = open('Boston_feature_matrix_full.pkl', 'rb')
+# NewYork_full = open('NewYork_feature_matrix_full.pkl', 'rb')
 
 try: 
 	# Get feature matrix from pickled files to create linear regression model
@@ -60,6 +67,7 @@ try:
 	SD_file_matrix = pickle.load(SanDiego_f)
 	PH_file_matrix = pickle.load(Phoenix_f)
 	B_file_matrix = pickle.load(Boston_f) 
+	NY_file_matrix = pickle.load(NewYork_f) 
 	
 	# Convert each file into a matrix
 	# Each city gets a matrix called CITY_xtest that has just the weather features
@@ -84,7 +92,7 @@ try:
 
 	Midwest_zmatrix = stats.zscore(np.concatenate((KC_X, SL_X)))
 	Midwest_Y = np.concatenate((KC_Y, SL_Y))
-	MW_X_train, MW_X_test, MW_y_train, MW_y_test = train_test_split(Midwest_zmatrix, Midwest_Y, test_size=0.33, random_state=42)
+	MW_X_train, MW_X_test, MW_y_train, MW_y_test = train_test_split(Midwest_zmatrix, Midwest_Y, test_size=0.20, random_state=42)
 
 
 	#------------- SOUTHEAST SAMPLES -------------#
@@ -95,7 +103,7 @@ try:
 	A_Y = np.array(A_yinit, dtype=float) 
 	
 	Southeast_zmatrix = stats.zscore(A_X)
-	SE_X_train, SE_X_test, SE_y_train, SE_y_test = train_test_split(Southeast_zmatrix, A_Y, test_size=0.33, random_state=42)
+	SE_X_train, SE_X_test, SE_y_train, SE_y_test = train_test_split(Southeast_zmatrix, A_Y, test_size=0.20, random_state=42)
 
 
 	#------------- NORTHWEST SAMPLES -------------#
@@ -113,7 +121,7 @@ try:
 
 	Northwest_zmatrix = stats.zscore(np.concatenate((SE_X, P_X)))
 	Northwest_Y = np.concatenate((SE_Y, P_Y))
-	NW_X_train, NW_X_test, NW_y_train, NW_y_test = train_test_split(Northwest_zmatrix, Northwest_Y, test_size=0.33, random_state=42)
+	NW_X_train, NW_X_test, NW_y_train, NW_y_test = train_test_split(Northwest_zmatrix, Northwest_Y, test_size=0.20, random_state=42)
 
 
 	#------------- SOUTHWEST SAMPLES -------------#
@@ -131,7 +139,7 @@ try:
 
 	Southwest_zmatrix = stats.zscore(np.concatenate((SD_X, PH_X)))
 	Southwest_Y = np.concatenate((SD_Y, PH_Y))
-	SW_X_train, SW_X_test, SW_y_train, SW_y_test = train_test_split(Southwest_zmatrix, Southwest_Y, test_size=0.33, random_state=42)
+	SW_X_train, SW_X_test, SW_y_train, SW_y_test = train_test_split(Southwest_zmatrix, Southwest_Y, test_size=0.20, random_state=42)
 	
 
 	#------------- NORTHEAST SAMPLES -------------#
@@ -141,8 +149,15 @@ try:
 	B_yinit = B_feature_matrix[:,6] 		# Just a vector of n_samples (i.e. the sentiment polarity labels)
 	B_Y = np.array(B_yinit, dtype=float) 
 
-	Northeast_zmatrix = stats.zscore(B_X)
-	NE_X_train, NE_X_test, NE_y_train, NE_y_test = train_test_split(Northeast_zmatrix, B_Y, test_size=0.33, random_state=42)
+	NY_feature_matrix = np.matrix(NY_file_matrix)
+	NY_xinit = NY_feature_matrix[:, 2:6] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
+	NY_X = np.array(NY_xinit, dtype=float)
+	NY_yinit = NY_feature_matrix[:,6] 		# Just a vector of n_samples (i.e. the sentiment polarity labels)
+	NY_Y = np.array(NY_yinit, dtype=float) 
+
+	Northeast_zmatrix = stats.zscore(np.concatenate((B_X, NY_X)))
+	Northeast_Y = np.concatenate((B_Y, NY_Y))
+	NE_X_train, NE_X_test, NE_y_train, NE_y_test = train_test_split(Northeast_zmatrix, Northeast_Y, test_size=0.20, random_state=42)
 
 
 
@@ -191,73 +206,65 @@ try:
 
 	# Save each true value matrix to csv
 	MW_df_act = pd.DataFrame(MW_y_test)
-	MW_df_act.to_csv("MW_y_test.csv")
-	#numpy.savetxt("MW_y_test.csv", MW_y_test, delimiter=",")
+	MW_df_act.to_csv("MW_y_true.csv")
 
 	SE_df_act = pd.DataFrame(MW_y_test)
-	SE_df_act.to_csv("SE_y_test.csv")
-	#numpy.savetxt("MW_y_test.csv", MW_y_test, delimiter=",")
+	SE_df_act.to_csv("SE_y_true.csv")
 
 	NW_df_act = pd.DataFrame(NW_y_test)
-	NW_df_act.to_csv("NW_y_test.csv")
-	#numpy.savetxt("MW_y_test.csv", MW_y_test, delimiter=",")
+	NW_df_act.to_csv("NW_y_true.csv")
 
 	SW_df_act = pd.DataFrame(SW_y_test)
-	SW_df_act.to_csv("SW_y_test.csv")
-	#numpy.savetxt("MW_y_test.csv", MW_y_test, delimiter=",")
+	SW_df_act.to_csv("SW_y_true.csv")
 	
 	NE_df_act = pd.DataFrame(NE_y_test)
-	NE_df_act.to_csv("NE_y_test.csv")
-	#numpy.savetxt("NE_y_test.csv", NE_y_test, delimiter=",")
+	NE_df_act.to_csv("NE_y_true.csv")
+
 
 
 	# Save each prediction matrix to csv 
 	MW_df_pred = pd.DataFrame(MW_pred)
 	MW_df_pred.to_csv("MW_df_pred.csv")
-	# numpy.savetxt("MW_pred.csv", MW_pred, delimiter=",")
 
 	SE_df_pred = pd.DataFrame(SE_pred)
 	SE_df_pred.to_csv("SE_df_pred.csv")
-	#numpy.savetxt("SE_pred.csv", SE_pred, delimiter=",")
 
 	NW_df_pred = pd.DataFrame(NW_pred)
 	NW_df_pred.to_csv("NW_df_pred.csv")
-	#numpy.savetxt("NW_pred.csv", NW_pred, delimiter=",")
 
 	SW_df_pred = pd.DataFrame(SW_pred)
 	SW_df_pred.to_csv("SW_df_pred.csv")
-	#numpy.savetxt("SW_pred.csv", SW_pred, delimiter=",")
 
 	NE_df_pred = pd.DataFrame(NE_pred)
 	NE_df_pred.to_csv("NE_df_pred.csv")
-	# numpy.savetxt("NE_pred.csv", NE_pred, delimiter=",")
 
 
 	
 	#------------- RANDOM FOREST CLASSIFIER -------------#
 
-	# Load full feature matrix from pickled files to create random forest classifier
-	KC_full_matrix = pickle.load(KansasCity_full)
-	SL_full_matrix = pickle.load(StLouis_full)
-	A_full_matrix = pickle.load(Atlanta_full)
-	SE_full_matrix = pickle.load(Seattle_full)
-	P_full_matrix = pickle.load(Portland_full)
-	SD_full_matrix = pickle.load(SanDiego_full)
-	PH_full_matrix = pickle.load(Phoenix_full)
-	B_full_matrix = pickle.load(Boston_full) 
+	# # Load full feature matrix from pickled files to create random forest classifier
+	# KC_full_matrix = pickle.load(KansasCity_full)
+	# SL_full_matrix = pickle.load(StLouis_full)
+	# A_full_matrix = pickle.load(Atlanta_full)
+	# SE_full_matrix = pickle.load(Seattle_full)
+	# P_full_matrix = pickle.load(Portland_full)
+	# SD_full_matrix = pickle.load(SanDiego_full)
+	# PH_full_matrix = pickle.load(Phoenix_full)
+	# B_full_matrix = pickle.load(Boston_full) 
+	# NY_full_matrix = pickle.load(NewYork_full)
 
 
 	# #------------- MIDWEST SAMPLES -------------#
 	# KC_full_fmatrix = np.matrix(KC_full_matrix)
 	# KC_fin_matrix = np.delete(KC_full_fmatrix, 3, 1)
-	# KC_xinit_full = KC_fin_matrix[:, 2:13] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
+	# KC_xinit_full = KC_fin_matrix[:, 2:14] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
 	# KC_X_full = np.array(KC_xinit_full, dtype=float)
 	# KC_yinit_full = KC_fin_matrix[:,14] 		# Just a vector of n_samples (i.e. the sentiment polarity labels)
 	# KC_Y_full = np.array(KC_yinit_full, dtype=float) 
 
 	# SL_full_fmatrix = np.matrix(SL_full_matrix)
 	# SL_fin_matrix = np.delete(SL_full_fmatrix, 3, 1)
-	# SL_xinit_full = SL_fin_matrix[:, 2:13] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
+	# SL_xinit_full = SL_fin_matrix[:, 2:14] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
 	# SL_X_full = np.array(SL_xinit_full, dtype=float)
 	# SL_yinit_full = SL_fin_matrix[:,14] 		# Just a vector of n_samples (i.e. the sentiment polarity labels)
 	# SL_Y_full = np.array(SL_yinit_full, dtype=float) 
@@ -268,12 +275,14 @@ try:
 	# Midwest_clf_y[Midwest_clf_y < 0] = -1
 	# Midwest_clf_y[Midwest_clf_y > 0] = 1
 
+	# MW_X_train, MW_X_test, MW_y_train, MW_y_test = train_test_split(Midwest_clf_x, Midwest_clf_y, test_size=0.20, random_state=42)
+
 
 
 	# #------------- SOUTHEAST SAMPLES -------------#
 	# A_full_fmatrix = np.matrix(A_full_matrix)
 	# A_fin_matrix = np.delete(A_full_fmatrix, 3, 1)
-	# A_xinit_full = A_fin_matrix[:, 2:13] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
+	# A_xinit_full = A_fin_matrix[:, 2:14] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
 	# A_X_full = np.array(A_xinit_full, dtype=float)
 	# A_yinit_full = A_fin_matrix[:,14] 		# Just a vector of n_samples (i.e. the sentiment polarity labels)
 	# A_Y_full = np.array(A_yinit_full, dtype=float) 
@@ -289,19 +298,21 @@ try:
 	# Southeast_clf_y[Southeast_clf_y < 0] = -1
 	# Southeast_clf_y[Southeast_clf_y > 0] = 1
 
+	# SE_X_train, SE_X_test, SE_y_train, SE_y_test = train_test_split(Southeast_clf_x, Southeast_clf_y, test_size=0.20, random_state=42)
+
 
 
 	# #------------- NORTHWEST SAMPLES -------------#
 	# SE_full_fmatrix = np.matrix(SE_full_matrix)
 	# SE_fin_matrix = np.delete(SE_full_fmatrix, 3, 1)
-	# SE_xinit_full = SE_fin_matrix[:, 2:13] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
+	# SE_xinit_full = SE_fin_matrix[:, 2:14] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
 	# SE_X_full = np.array(SE_xinit_full, dtype=float)
 	# SE_yinit_full = SE_fin_matrix[:,14] 		# Just a vector of n_samples (i.e. the sentiment polarity labels)
 	# SE_Y_full = np.array(SE_yinit_full, dtype=float) 
 
 	# P_full_fmatrix = np.matrix(P_full_matrix)
 	# P_fin_matrix = np.delete(P_full_fmatrix, 3, 1)
-	# P_xinit_full = P_fin_matrix[:, 2:13] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
+	# P_xinit_full = P_fin_matrix[:, 2:14] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
 	# P_X_full = np.array(P_xinit_full, dtype=float)
 	# P_yinit_full = P_fin_matrix[:,14] 		# Just a vector of n_samples (i.e. the sentiment polarity labels)
 	# P_Y_full = np.array(P_yinit_full, dtype=float) 
@@ -313,18 +324,21 @@ try:
 	# Northwest_clf_y[Northwest_clf_y < 0] = -1
 	# Northwest_clf_y[Northwest_clf_y > 0] = 1
 
+	# NW_X_train, NW_X_test, NW_y_train, NW_y_test = train_test_split(Northwest_clf_x, Northwest_clf_y, test_size=0.20, random_state=42)
+
+
 
 	# #------------- SOUTHWEST SAMPLES -------------#
 	# SD_full_fmatrix = np.matrix(SD_full_matrix)
 	# SD_fin_matrix = np.delete(SD_full_fmatrix, 3, 1)
-	# SD_xinit_full = SD_fin_matrix[:, 2:13] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
+	# SD_xinit_full = SD_fin_matrix[:, 2:14] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
 	# SD_X_full = np.array(SD_xinit_full, dtype=float)
 	# SD_yinit_full = SD_fin_matrix[:,14] 		# Just a vector of n_samples (i.e. the sentiment polarity labels)
 	# SD_Y_full = np.array(SD_yinit_full, dtype=float) 
 
 	# PH_full_fmatrix = np.matrix(PH_full_matrix)
 	# PH_fin_matrix = np.delete(PH_full_fmatrix, 3, 1)
-	# PH_xinit_full = PH_fin_matrix[:, 2:13] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
+	# PH_xinit_full = PH_fin_matrix[:, 2:14] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
 	# PH_X_full = np.array(PH_xinit_full, dtype=float)
 	# PH_yinit_full = PH_fin_matrix[:,14] 		# Just a vector of n_samples (i.e. the sentiment polarity labels)
 	# PH_Y_full = np.array(PH_yinit_full, dtype=float) 
@@ -335,6 +349,9 @@ try:
 	# Southwest_clf_y[Southwest_clf_y < 0] = -1
 	# Southwest_clf_y[Southwest_clf_y > 0] = 1
 
+	# SW_X_train, SW_X_test, SW_y_train, SW_y_test = train_test_split(Southwest_clf_x, Southwest_clf_y, test_size=0.20, random_state=42)
+
+
 
 	# #------------- NORTHEAST SAMPLES -------------#
 	# B_full_fmatrix = np.matrix(B_full_matrix)
@@ -344,16 +361,28 @@ try:
 	# B_yinit_full = B_fin_matrix[:,14] 		# Just a vector of n_samples (i.e. the sentiment polarity labels)
 	# B_Y_full = np.array(B_yinit_full, dtype=float) 
 
-	# print("B full shape",B_full_fmatrix.shape)
-	# print("B full matrix", B_full_fmatrix[0])
-	# print("B full 2 matrix", B_fin_matrix[0])
-	# print("B x shape",B_X_full[0])
-	# print("B y shape",B_Y_full)
-	# #Northeast_clf_x = stats.zscore(B_X_full)
-	# Northeast_clf_x = B_X_full
-	# Northeast_clf_y = B_Y_full.ravel()
+
+	# NY_full_fmatrix = np.matrix(NY_full_matrix)
+	# print("NY shape", NY_full_fmatrix.shape)
+	# print("NY row", NY_full_fmatrix[0])
+	# NY_fin_matrix = np.delete(NY_full_fmatrix, 3, 1)
+	# NY_xinit_full = NY_fin_matrix[:, 2:14] 		# Matrix of shape[n_samples, n_features] (i.e. the weather)
+	# NY_X_full = np.array(NY_xinit_full, dtype=float)
+	# NY_yinit_full = NY_fin_matrix[:,14] 		# Just a vector of n_samples (i.e. the sentiment polarity labels)
+	# NY_Y_full = np.array(NY_yinit_full, dtype=float) 
+
+	# # print("B full shape",B_full_fmatrix.shape)
+	# # print("B full matrix", B_full_fmatrix[0])
+	# # print("B full 2 matrix", B_fin_matrix[0])
+	# # print("B x shape",B_X_full[0])
+	# # print("B y shape",B_Y_full)
+	# Northeast_clf_x = np.concatenate((B_X_full, NY_X_full))
+	# Northeast_clf_y = np.concatenate((B_Y_full, NY_Y_full)).ravel()
 	# Northeast_clf_y[Northeast_clf_y < 0] = -1
 	# Northeast_clf_y[Northeast_clf_y > 0] = 1
+
+	# NE_X_train, NE_X_test, NE_y_train, NE_y_test = train_test_split(Northeast_clf_x, Northeast_clf_y, test_size=0.20, random_state=42)
+
 
 	# Midwest_clf = RandomForestClassifier(n_estimators=10000, random_state=0, n_jobs=-1)
 	# Southeast_clf = RandomForestClassifier(n_estimators=10000, random_state=0, n_jobs=-1)
@@ -361,27 +390,42 @@ try:
 	# Southwest_clf = RandomForestClassifier(n_estimators=10000, random_state=0, n_jobs=-1)
 	# Northeast_clf = RandomForestClassifier(n_estimators=10000, random_state=0, n_jobs=-1)
 	
-	# # print("About to run random forest classifier")
-	# # #print("Midwest_clf_x", Midwest_clf_x)
-	# # print("finished midwest")
-	# # print("finite?", np.isfinite(Southeast_clf_x))
-	# # print("finite?", np.isfinite(Southeast_clf_y))
-	# # print("finite?", np.isfinite(Northwest_clf_x))
-	# # print("finite?", np.isfinite(Northwest_clf_y))
-	# # print("finite?", np.isfinite(Southwest_clf_x))
-	# # print("finite?", np.isfinite(Southwest_clf_y))
-	# # print("finite?", np.isfinite(Northeast_clf_x))
-	# # print("finite?", np.isfinite(Northeast_clf_y))
-	# Midwest_clf.fit(Midwest_clf_x, Midwest_clf_y)
-	# Southeast_clf.fit(Southeast_clf_x, Southeast_clf_y) 
-	# Northwest_clf.fit(Northwest_clf_x, Northwest_clf_y) 
-	# Southwest_clf.fit(Southwest_clf_x, Southwest_clf_y)
-	# Northeast_clf.fit(Northeast_clf_x, Midwest_clf_y)
+	# print("About to run random forest classifier")
+	
+	# Midwest_clf.fit(MW_X_train, MW_y_train)
+	# Southeast_clf.fit(SE_X_train, SE_y_train)
+	# Northwest_clf.fit(NW_X_train, NW_y_train) 
+	# Southwest_clf.fit(SW_X_train, SW_y_train)
+	# Northeast_clf.fit(NE_X_train, NE_y_train)
 
+	#------------- ACTUAL MAJORITY VALUE -------------# 
+	# MW_pop_sent = findPopularSentiment(MW_y_test)
+	# SE_pop_sent = findPopularSentiment(SE_y_test)
+	# NW_pop_sent = findPopularSentiment(NW_y_test)
+	# SW_pop_sent = findPopularSentiment(SW_y_test)
+	# NE_pop_sent = findPopularSentiment(NE_y_test)	
+
+	#------------- PREDICT USING CLASSIFIER -------------# 
+	# MW_pred_sent = Midwest_clf.predict(MW_X_test)
+	# SE_pred_sent = Southeast_clf.predict(SE_X_test)
+	# NW_pred_sent = Northwest_clf.predict(NW_X_test) 
+	# SW_pred_sent = Southwest_clf.predict(SW_X_test)
+	# NE_pred_sent = Northeast_clf.predict(NE_X_test)
+
+
+	# Save each true value matrix to csv
+	# NE_df_act = pd.DataFrame(NE_y_test)
+	# NE_df_act.to_csv("NE_y_true_clf.csv")
+
+	# Save each prediction matrix to csv 
+	# NE_df_pred = pd.DataFrame(NE_pred_sent)
+	# NE_df_pred.to_csv("NE_df_pred_clf.csv")
+
+
+	# #------------- PRINT STATEMENTS FOR LINEAR REGRESSION -------------# 
 
 	# Feature labels to be used so that weather features are ordered 
 	feat_labels = ['Humidity','Pressure','Temperature','Wind Speed']
-	feat_labels_full = ['Humidity','Pressure','Temperature','Wind Speed', 'Clear','Rain','Snow','Sleet','Wind','Fog','Cloudy','Partly Cloudy']
 
 	# Select feature importance (compare to weights found)
 	MW_sfm = SelectFromModel(Midwest_linreg)
@@ -390,9 +434,7 @@ try:
 	print("     Linear reg feature weights: ", Midwest_weights) 
 	for feature_list_index in MW_sfm.get_support(indices=True): 
 	 	print("    ",  feat_labels[feature_list_index] ) 
-	# print("     Random forest important features:")
-	# for feature in zip(feat_labels_full, Midwest_clf.feature_importances_):
-	#     print("    ", feature)
+	
 	
 	SE_sfm = SelectFromModel(Southeast_linreg)
 	SE_sfm.fit(Southeast_zmatrix, A_Y)
@@ -400,9 +442,7 @@ try:
 	print("     Linear reg feature weights: ", Southeast_weights) 
 	for feature_list_index in SE_sfm.get_support(indices=True): 
 	 	print("    ",  feat_labels[feature_list_index] ) 
-	# print("     Random forest important features:")
-	# for feature in zip(feat_labels_full, Southeast_clf.feature_importances_):
-	#     print("    ", feature)
+	
 
 	NW_sfm = SelectFromModel(Northwest_linreg)
 	NW_sfm.fit(Northwest_zmatrix, Northwest_Y)
@@ -410,9 +450,7 @@ try:
 	print("     Linear reg feature weights: ", Northwest_weights) 
 	for feature_list_index in NW_sfm.get_support(indices=True): 
 	 	print("    ",  feat_labels[feature_list_index] ) 
-	# print("     Random forest important features:")
-	# for feature in zip(feat_labels_full, Northwest_clf.feature_importances_):
-	#     print("    ", feature)
+	
 
 	SW_sfm = SelectFromModel(Southwest_linreg)
 	SW_sfm.fit(Southwest_zmatrix, Southwest_Y)
@@ -420,22 +458,58 @@ try:
 	print("     Linear reg feature weights: ", Southwest_weights) 
 	for feature_list_index in SW_sfm.get_support(indices=True): 
 	 	print("    ",  feat_labels[feature_list_index] ) 
-	# print("     Random forest important features:")
-	# for feature in zip(feat_labels_full, Southwest_clf.feature_importances_):
-	#     print("    ", feature)
+	
 
 	NE_sfm = SelectFromModel(Northeast_linreg)
-	NE_sfm.fit(Northeast_zmatrix, B_Y)
+	NE_sfm.fit(Northeast_zmatrix, Northeast_Y)
 	print("\nNortheast:")
 	print("     Linear reg feature weights: ", Northeast_weights) 
 	for feature_list_index in NE_sfm.get_support(indices=True): 
 	 	print("    ", feat_labels[feature_list_index] ) 
+	
+
+
+	#------------- PRINT STATEMENTS FOR RANDOM FOREST FEATURE IMPORTANCE -------------# 
+
+	feat_labels_full = ['Humidity','Pressure','Temperature','Wind Speed', 'Clear','Rain','Snow','Sleet','Wind','Fog','Cloudy','Partly Cloudy']
+
+	# print("\nMidwest:")
+	# print("Predicted classification: ", MW_pred_sent)
+	# print("Actual classification: ", MW_pop_sent)
 	# print("     Random forest important features:")
-	# for feature in zip(feat_labels_full, Northeast_clf.feature_importances_):
+	# for feature in zip(feat_labels_full, Midwest_clf.feature_importances_):
 	#     print("    ", feature)
 
 
+	# print("\nSoutheast:")
+	# print("Predicted classification: ", SE_pred_sent)
+	# print("Actual classification: ", SE_pop_sent)
+	# print("     Random forest important features:")
+	# for feature in zip(feat_labels_full, Southeast_clf.feature_importances_):
+	#     print("    ", feature)
 
+	# print("\nNorthwest:")
+	# print("Predicted classification: ",  NW_pred_sent)
+	# print("Actual classification: ", NW_pop_sent)
+	# print("     Random forest important features:")
+	# for feature in zip(feat_labels_full, Northwest_clf.feature_importances_):
+	#     print("    ", feature)
+
+
+	# print("\nSouthwest:")
+	# print("Predicted classification: ", SW_pred_sent)
+	# print("Actual classification: ", SW_pop_sent)
+	# print("     Random forest important features:")
+	# for feature in zip(feat_labels_full, Southwest_clf.feature_importances_):
+	#     print("    ", feature)
+
+
+	# print("\nNortheast:")
+	# print("Predicted classification: ", NE_pred_sent)
+	# print("Actual classification: ", NE_pop_sent)
+	# print("     Random forest important features:")
+	# for feature in zip(feat_labels_full, Northeast_clf.feature_importances_):
+	#     print("    ", feature)
 
 
 
@@ -449,15 +523,17 @@ finally:
 	SanDiego_f.close()
 	Phoenix_f.close()
 	Boston_f.close()
+	NewYork_f.close()
 
-	KansasCity_full.close()		# Close files
-	StLouis_full.close()
-	Atlanta_full.close()
-	Seattle_full.close()
-	Portland_full.close()
-	SanDiego_full.close()
-	Phoenix_full.close()
-	Boston_full.close()
+	# KansasCity_full.close()		# Close files
+	# StLouis_full.close()
+	# Atlanta_full.close()
+	# Seattle_full.close()
+	# Portland_full.close()
+	# SanDiego_full.close()
+	# Phoenix_full.close()
+	# Boston_full.close()
+	# NewYork_full.close()
 
 
 
