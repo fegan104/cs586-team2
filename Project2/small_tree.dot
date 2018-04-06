@@ -1,0 +1,33 @@
+digraph Tree {
+node [shape=box, style="rounded", color="black", fontname=helvetica] ;
+edge [fontname=helvetica] ;
+0 [label="numViolations <= 450.5\nmse = 20.7\nsamples = 5566\nvalue = 5.0"] ;
+1 [label="numBuses <= 121.5\nmse = 7.3\nsamples = 2750\nvalue = 2.7"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="numBuses <= 89.5\nmse = 4.2\nsamples = 1338\nvalue = 1.7"] ;
+1 -> 2 ;
+3 [label="mse = 3.2\nsamples = 800\nvalue = 1.2"] ;
+2 -> 3 ;
+4 [label="mse = 4.9\nsamples = 538\nvalue = 2.4"] ;
+2 -> 4 ;
+5 [label="numSubway <= 11.5\nmse = 8.1\nsamples = 1412\nvalue = 3.8"] ;
+1 -> 5 ;
+6 [label="mse = 7.3\nsamples = 1380\nvalue = 3.7"] ;
+5 -> 6 ;
+7 [label="mse = 12.6\nsamples = 32\nvalue = 9.8"] ;
+5 -> 7 ;
+8 [label="numViolations <= 2142.0\nmse = 23.5\nsamples = 2816\nvalue = 7.3"] ;
+0 -> 8 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+9 [label="numMisdemeanors <= 19.5\nmse = 14.1\nsamples = 2438\nvalue = 6.4"] ;
+8 -> 9 ;
+10 [label="mse = 9.3\nsamples = 1212\nvalue = 5.3"] ;
+9 -> 10 ;
+11 [label="mse = 16.7\nsamples = 1226\nvalue = 7.4"] ;
+9 -> 11 ;
+12 [label="totalPoi <= 18.5\nmse = 40.3\nsamples = 378\nvalue = 13.6"] ;
+8 -> 12 ;
+13 [label="mse = 24.9\nsamples = 307\nvalue = 12.0"] ;
+12 -> 13 ;
+14 [label="mse = 44.3\nsamples = 71\nvalue = 20.7"] ;
+12 -> 14 ;
+}
