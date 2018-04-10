@@ -1,4 +1,4 @@
-borough1-5,LAND SQUARE FEET,GROSS SQUARE FEET,YEAR BUILT,SALE PRICE,commercial,residencial,mixed,# of bus_stop,# of subway_station,# of FELONY,# of VIOLATION,# of MISDEMEANOR,total # of poi,poi type 1,poi type 2,poi type 3,poi type 4,poi type 5,poi type 6,poi type 7,poi type 8,poi type 9,poi type 10,poi type 11,poi type 12,poi type 13,# of roads,total width of raods
+borough,LAND SQUARE FEET,GROSS SQUARE FEET,YEAR BUILT,SALE PRICE,commercial,residencial,mixed,# of bus_stop,# of subway_station,# of FELONY,# of VIOLATION,# of MISDEMEANOR,total # of poi,poi type 1,poi type 2,poi type 3,poi type 4,poi type 5,poi type 6,poi type 7,poi type 8,poi type 9,poi type 10,poi type 11,poi type 12,poi type 13,# of roads,total width of raods
 1,0,0,0,0,6834,143730,2007,100107200,1,0,0,7,8,782,332,1340,95,8,7,52,9,7,6,5,1,0,0,0,0,0,308,10420
 1,0,0,0,0,2562,42568,2007,42845395,1,0,0,12,13,1305,493,3154,123,14,5,60,18,13,5,3,1,2,2,0,0,0,297,10116
 1,0,0,0,0,10622,160545,2007,109915000,1,0,0,7,8,2135,539,4417,84,4,9,56,9,0,1,0,4,0,0,0,1,0,303,10212
